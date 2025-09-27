@@ -44,7 +44,7 @@ Move your player left and right to collect falling coins. Simple, fun, and exten
 
 4. Run the game:
    ```bash
-   python game.py
+   python fall_coins.py
    ```
 
 ---
@@ -59,7 +59,7 @@ Move your player left and right to collect falling coins. Simple, fun, and exten
 
 | Version | Date       | Notes                         |
 |---------|------------|-------------------------------|
-| v0.1.0  | YYYY-MM-DD | First playable version        |
+| v0.1.0  | 27-09-2025 | First playable version        |
 <!-- | v0.2.0  | YYYY-MM-DD | Added lives & game over screen|
 | v0.3.0  | YYYY-MM-DD | Difficulty scaling & sound fx | -->
 
