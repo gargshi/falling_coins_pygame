@@ -1,4 +1,4 @@
-# Falling Coins 🎮
+# Falling Coins
 
 A lightweight arcade-style game made with **Python** and **Pygame**.  
 Move your player left and right to collect falling coins. Simple, fun, and extendable.
