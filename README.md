@@ -57,9 +57,10 @@ Move your player left and right to collect falling coins. Simple, fun, and exten
 
 ## Releases & Updates
 
-| Version | Date       | Notes                         |
-|---------|------------|-------------------------------|
-| v0.1.0  | 27-09-2025 | First playable version        |
+| Version | Date       | Notes                                        |
+|---------|------------|----------------------------------------------|
+| v0.1.0  | 27-09-2025 | First playable version                       |
+| v0.1.1  | 28-09-2025 | Added settings persistence and assets        |
 <!-- | v0.2.0  | YYYY-MM-DD | Added lives & game over screen|
 | v0.3.0  | YYYY-MM-DD | Difficulty scaling & sound fx | -->
 
