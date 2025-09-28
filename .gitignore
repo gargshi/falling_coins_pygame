@@ -32,3 +32,5 @@ dist/
 html/
 
 Commands.txt
+settings.txt
+build.bat
