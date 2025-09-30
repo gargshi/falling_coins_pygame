@@ -17,12 +17,21 @@ session = {
     "high_score": 0,
     "stg_high_score": 0,  # To track if high score changed during session
 }
+
+meta_data = {
+    "fallback_sys_font": "Consolas",
+    "font_path": "assets/fonts/Electrolize-Regular.ttf"
+}
 # debug print fn
+
+
 def dprint(msg):
     if DEBUG:
         print(msg)
 
 # ----------------- Settings -----------------
+
+
 def save_settings():
     """Save session values to settings.txt"""
     with open(SETTINGS_FILE, "w") as f:
@@ -45,12 +54,21 @@ def load_settings():
         dprint("Settings file not found. Using defaults.")
         save_settings()
 
+# ----------------- Helpers -----------------
+
+
+def resource_path(relative_path):
+    """Get absolute path to resource (works for dev and PyInstaller)"""
+    if hasattr(sys, "_MEIPASS"):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
+
 
 # ----------------- Init Pygame -----------------
 pygame.init()
 load_settings()
 
-WIDTH, HEIGHT = 600, 400
+WIDTH, HEIGHT = 380, 640
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Falling Coins Game")
 
@@ -60,16 +78,9 @@ GOLD = (255, 223, 0)
 YELLOW = (255, 255, 0)
 
 clock = pygame.time.Clock()
-font = pygame.font.SysFont("Arial", 25)
-
-
-# ----------------- Helpers -----------------
-def resource_path(relative_path):
-    """Get absolute path to resource (works for dev and PyInstaller)"""
-    if hasattr(sys, "_MEIPASS"):
-        return os.path.join(sys._MEIPASS, relative_path)
-    return os.path.join(os.path.abspath("."), relative_path)
-
+# font = pygame.font.Font(resource_path("assets/fonts/Electrolize-Regular.ttf"), 24) or pygame.font.SysFont("Consolas", 20)
+# font = pygame.font.Font(resource_path(meta_data["font_path"]), 24)
+# sys_font = pygame.font.SysFont(meta_data["fallback_sys_font"], 20)
 
 # ----------------- Sounds -----------------
 pygame.mixer.init()
@@ -79,9 +90,31 @@ loser_sound = pygame.mixer.Sound(resource_path("assets/sounds/loser.mp3"))
 
 
 # ----------------- UI Helpers -----------------
-def draw_text(text, x, y, color=WHITE):
-    """Helper to draw centered text"""
-    label = font.render(text, True, color)
+# def draw_text(text, x, y, color=WHITE):
+#     """Helper to draw centered text"""
+#     label = font.render(text, True, color)
+#     rect = label.get_rect(center=(x, y))
+#     screen.blit(label, rect)
+def draw_text(text, x, y, color=WHITE, size=25, font_name=meta_data["font_path"], sys_font_name=meta_data["fallback_sys_font"], use_sysfont=False):
+    """
+    Draw centered text with adjustable font size.
+
+    Args:
+        text (str): Text to render
+        x, y (int): Position of text center
+        color (tuple): RGB color
+        size (int): Font size (default=25)
+        font_name (str): System font name (e.g., "Arial") or path to TTF
+        use_sysfont (bool): If True, load system font. If False, load TTF from assets.
+    """
+    if use_sysfont:
+        # System font (cross-platform fallback)
+        font_obj = pygame.font.SysFont(sys_font_name or "Arial", size)
+    else:
+        # Bundled font (Google or custom TTF in assets/fonts/)
+        font_obj = pygame.font.Font(resource_path(font_name or "assets/fonts/Electrolize-Regular.ttf"), size) or pygame.font.SysFont(sys_font_name, size)
+
+    label = font_obj.render(text, True, color)
     rect = label.get_rect(center=(x, y))
     screen.blit(label, rect)
 
@@ -89,7 +122,7 @@ def draw_text(text, x, y, color=WHITE):
 # ----------------- Menus -----------------
 def main_menu():
     """Main Menu screen"""
-    options = ["Start Game", "Settings", "Quit"]
+    options = ["Start Game", "Settings", "Credits", "Quit"]
     selected = 0
 
     while True:
@@ -115,6 +148,27 @@ def main_menu():
                     selected = (selected + 1) % len(options)
                 elif event.key == pygame.K_RETURN:
                     return options[selected].lower().replace(" ", "_")
+
+
+def credits_menu():
+    """Credits Menu"""
+    while True:
+        screen.fill(BLACK)
+        draw_text("Credits", WIDTH // 2, 80, YELLOW)
+        draw_text("Version: 0.1.3", WIDTH // 2, 180, WHITE)
+        draw_text("Developed by Shivam", WIDTH // 2, 250, WHITE)
+        draw_text("Press ESC to return", WIDTH // 2, 400, WHITE, size=18)
+
+        pygame.display.flip()
+        clock.tick(30)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return
 
 
 def pause_menu():
@@ -200,7 +254,8 @@ def game_loop():
 
     coins = []
     score = 0
-    session["high_score"] = session.get("stg_high_score", 0) # Initialize high score on start game or reseting game
+    # Initialize high score on start game or reseting game
+    session["high_score"] = session.get("stg_high_score", 0)
 
     coin_speed = 4 if session["difficulty"] == "Easy" else 7
     spawn_chance = 20 if session["difficulty"] == "Easy" else 10
@@ -238,10 +293,11 @@ def game_loop():
         for coin in coins[:]:
             if player_y < coin[1] + 10 and player_x < coin[0] < player_x + player_width:
                 score += 1
-                dprint(f"Score={score}, stg High Score={session['stg_high_score']}")
+                dprint(
+                    f"Score={score}, stg High Score={session['stg_high_score']}")
                 if score > session["stg_high_score"]:
                     session["high_score"] = score
-                    if session["sound_on"] and score == session["stg_high_score"]+1 and session["stg_high_score"]>0:
+                    if session["sound_on"] and score == session["stg_high_score"]+1 and session["stg_high_score"] > 0:
                         winner_sound.play()
                 coins.remove(coin)
                 if session["sound_on"]:
@@ -251,7 +307,8 @@ def game_loop():
         coins = [c for c in coins if c[1] < HEIGHT]
 
         # Draw player
-        pygame.draw.rect(screen, WHITE, (player_x, player_y, player_width, player_height))
+        pygame.draw.rect(screen, WHITE, (player_x, player_y,
+                         player_width, player_height))
 
         # Draw coins
         for coin in coins:
@@ -276,13 +333,12 @@ while True:
     elif action == "settings":
         settings_menu()
         save_settings()
+    elif action == "credits":
+        credits_menu()
     elif action == "quit":
         save_settings()
         pygame.quit()
         sys.exit()
-
-
-
 
 
 """old code"""
@@ -345,7 +401,6 @@ while True:
 # font = pygame.font.SysFont("Arial", 25)
 
 
-
 # def resource_path(relative_path):
 #     """Get absolute path to resource, works for dev and for PyInstaller"""
 #     if hasattr(sys, "_MEIPASS"):
@@ -400,7 +455,7 @@ while True:
 #                         pygame.quit(); sys.exit()
 
 
-# def pause_menu():    
+# def pause_menu():
 #     """Pause Menu"""
 
 #     options = ["Resume", "Main Menu"]
@@ -496,7 +551,7 @@ while True:
 #         if keys[pygame.K_ESCAPE]:
 #             action = pause_menu()
 #             if action == "main_menu":
-#                 return                    
+#                 return
 #         if keys[pygame.K_LEFT] and player_x > 0:
 #             player_x -= player_speed
 #         if keys[pygame.K_RIGHT] and player_x < WIDTH - player_width:
@@ -520,11 +575,11 @@ while True:
 #                 print(f"Score: {score}, high score: {player_high_score}")
 #                 print(f"Player High Score: {player_high_score}")
 #                 print(score>player_high_score)
-#                 if player_high_score >= 0 and score > session["high_score"]: #s1 hs0                    
+#                 if player_high_score >= 0 and score > session["high_score"]: #s1 hs0
 #                     if sound_on and winner_sound and score == session["high_score"]+1: #s1 hs0
 #                         winner_sound.play()
 #                     player_high_score = score#s1 hs0
-#                     save_settings()                        
+#                     save_settings()
 
 #                 coins.remove(coin)
 #                 if sound_on:
@@ -556,4 +611,3 @@ while True:
 #     elif action == "settings":
 #         settings_menu()
 #         save_settings()
-
