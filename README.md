@@ -24,7 +24,7 @@ Move your player left and right to collect falling coins. Simple, fun, and exten
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/your-username/falling-coins.git
+   git clone https://github.com/gargshi/falling_coins_pygame.git
    cd falling-coins
    ```
 
