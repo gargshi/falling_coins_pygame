@@ -63,6 +63,7 @@ Move your player left and right to collect falling coins. Simple, fun, and exten
 | v0.1.1  | 28-09-2025 | Added settings persistence and assets        |
 | v0.1.2  | 30-09-2025 | Added highscore system                       |
 | v0.1.3  | 30-09-2025 | Added Credits                                |
+| v0.1.4  | 01-10-2025 | UI changes and bug fixes                     |
 
 ---
 
